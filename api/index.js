@@ -1,12 +1,10 @@
+// Vercel Serverless Function
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
-
-// Configuration
-const config = require('./config');
 
 // الاتصال بقاعدة البيانات
 const connectDB = require('../config/database');
@@ -34,44 +32,13 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
-// Disable caching for development to prevent 304 issues
-app.use((req, res, next) => {
-  res.set({
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
-    'Pragma': 'no-cache',
-    'Expires': '0'
-  });
-  next();
-});
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: config.rateLimit.windowMs,
-  max: config.rateLimit.max,
-  message: {
-    success: false,
-    message: 'تم تجاوز الحد الأقصى للطلبات، يرجى المحاولة لاحقاً'
-  },
-  standardHeaders: true,
-  legacyHeaders: false
-});
-
-// Rate limiting خاص لـ login (أكثر تساهلاً للتطوير)
-const loginLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 دقائق
-  max: config.rateLimit.loginMax,
-  message: {
-    success: false,
-    message: 'تم تجاوز الحد الأقصى لمحاولات تسجيل الدخول، يرجى المحاولة لاحقاً'
-  },
-  skipSuccessfulRequests: true
-});
-
-app.use('/api/auth/login', loginLimiter);
-app.use('/api/', limiter);
-
-// CORS - يسمح بجميع المسارات والنقاط
-app.use(cors(config.cors));
+// CORS
+app.use(cors({
+  origin: '*',
+  credentials: false,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
+}));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -81,11 +48,19 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(compression());
 
 // Logging
-if (config.server.nodeEnv === 'development') {
-  app.use(morgan('dev'));
-} else {
-  app.use(morgan('combined'));
-}
+app.use(morgan('combined'));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 دقيقة
+  max: 100, // حد أقصى 100 طلب لكل IP
+  message: {
+    success: false,
+    message: 'تم تجاوز الحد الأقصى للطلبات، يرجى المحاولة لاحقاً'
+  }
+});
+
+app.use('/api/', limiter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -93,8 +68,20 @@ app.get('/health', (req, res) => {
     success: true,
     message: 'الخادم يعمل بشكل طبيعي',
     timestamp: new Date().toISOString(),
-    environment: config.server.nodeEnv,
+    environment: process.env.NODE_ENV || 'production',
     platform: 'Vercel'
+  });
+});
+
+// Status endpoint
+app.get('/status', (req, res) => {
+  res.json({
+    success: true,
+    message: 'API is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'production',
+    platform: 'Vercel',
+    version: '1.0.0'
   });
 });
 
@@ -110,7 +97,7 @@ app.use('/api/users', usersRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/location-features', locationFeaturesRoutes);
 
-// Public API Routes (بدون prefix إضافي)
+// Public API Routes
 app.use('/api', publicRoutes);
 
 // Default route
@@ -119,7 +106,14 @@ app.get('/', (req, res) => {
     success: true,
     message: 'مرحباً بك في API لوحة تحكم مشروع 24 - حي الزهراء',
     version: '1.0.0',
-    documentation: '/api/docs'
+    endpoints: {
+      health: '/health',
+      status: '/status',
+      api: '/api',
+      project: '/api/project-info',
+      auth: '/api/auth',
+      apartments: '/api/apartments'
+    }
   });
 });
 

@@ -1,161 +1,197 @@
-# مشروع 24 - حي الزهراء | Backend API
+# 🏢 مشروع 24 - حي الزهراء | Backend API
 
-## 🚀 الإعداد والتشغيل
+## 📋 الوصف
+هذا هو الـ backend الخاص بلوحة تحكم مشروع 24 في حي الزهراء بجدة. يوفر API شامل لإدارة المشروع العقاري مع دعم كامل لـ Vercel serverless functions.
+
+## ✨ المميزات
+- 🏠 إدارة نماذج الشقق
+- ⭐ إدارة المميزات والضمانات
+- 📸 إدارة الوسائط والصور
+- 🔐 نظام المصادقة والأذونات
+- 📞 إدارة الاستفسارات
+- 📊 إحصائيات المشروع
+- ☁️ دعم Vercel serverless
+- 🚀 تحسين الأداء
+
+## 🛠️ التقنيات المستخدمة
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB, Mongoose
+- **Authentication**: JWT
+- **File Upload**: Cloudinary, Multer
+- **Deployment**: Vercel
+- **Security**: Helmet, CORS, Rate Limiting
+
+## 🚀 التثبيت والتشغيل
 
 ### المتطلبات
-- Node.js (v18 أو أحدث)
-- MongoDB (محلي أو سحابي)
+- Node.js 18+
+- MongoDB Atlas
 - npm أو yarn
 
 ### خطوات التثبيت
-
-1. **تثبيت المكتبات**
 ```bash
+# 1. استنساخ المشروع
+git clone <repository-url>
+cd backend
+
+# 2. تثبيت المتطلبات
 npm install
-```
 
-2. **إعداد متغيرات البيئة**
-أنشئ ملف `.env` في مجلد `backend` مع المحتوى التالي:
-```env
-NODE_ENV=development
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/jeddah-real-estate-db
-JWT_SECRET=jeddah_real_estate_super_secret_key_2024_project24
-JWT_EXPIRES_IN=7d
-JWT_REFRESH_EXPIRES_IN=30d
-```
+# 3. إعداد متغيرات البيئة
+cp env.example .env
+# قم بتعديل .env بالقيم الصحيحة
 
-3. **إعداد قاعدة البيانات**
-```bash
-npm run setup
-```
-هذا الأمر سينشئ:
-- مستخدم super admin (admin@project24.com / admin123)
-- ضمانات تجريبية (6 ضمانات)
-- مميزات تجريبية (5 مميزات)
-
-4. **تشغيل الخادم**
-```bash
-# للتطوير
+# 4. تشغيل المشروع محلياً
 npm run dev
 
-# للإنتاج
+# 5. أو تشغيل في production
 npm start
 ```
 
-## 🔌 API Endpoints
+## 🔧 متغيرات البيئة
+
+### المطلوبة
+```env
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database_name?retryWrites=true&w=majority
+JWT_SECRET=your-super-secret-jwt-key-here
+NODE_ENV=production
+```
+
+### الاختيارية
+```env
+CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
+CLOUDINARY_API_KEY=your-cloudinary-api-key
+CLOUDINARY_API_SECRET=your-cloudinary-api-secret
+GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+```
+
+## 🌐 API Endpoints
 
 ### المصادقة
 - `POST /api/auth/login` - تسجيل الدخول
 - `POST /api/auth/logout` - تسجيل الخروج
 - `POST /api/auth/refresh` - تجديد التوكن
-- `GET /api/auth/profile` - الملف الشخصي
 
-### الشقق
-- `GET /api/apartments` - جلب جميع الشقق
-- `GET /api/apartments/:id` - جلب شقة محددة
-- `POST /api/apartments` - إنشاء شقة جديدة
-- `PUT /api/apartments/:id` - تعديل شقة
-- `DELETE /api/apartments/:id` - حذف شقة
-
-### الوسائط
-- `GET /api/media` - جلب جميع الوسائط
-- `GET /api/media/:id` - جلب وسائط محددة
-- `POST /api/media/upload` - رفع ملف واحد
-- `POST /api/media/upload-multiple` - رفع ملفات متعددة
-- `PUT /api/media/:id` - تعديل وسائط
-- `DELETE /api/media/:id` - حذف وسائط
-
-### المميزات
-- `GET /api/project/features` - جلب جميع المميزات
-- `GET /api/project/features/:id` - جلب ميزة محددة
-- `POST /api/project/features` - إنشاء ميزة جديدة
-- `PUT /api/project/features/:id` - تعديل ميزة
-- `DELETE /api/project/features/:id` - حذف ميزة
-
-### الضمانات
-- `GET /api/project/warranties` - جلب جميع الضمانات
-- `GET /api/project/warranties/:id` - جلب ضمان محدد
-- `POST /api/project/warranties` - إنشاء ضمان جديد
-- `PUT /api/project/warranties/:id` - تعديل ضمان
-- `DELETE /api/project/warranties/:id` - حذف ضمان
+### نماذج الشقق
+- `GET /api/apartments` - جلب جميع النماذج
+- `POST /api/apartments` - إنشاء نموذج جديد
+- `PUT /api/apartments/:id` - تحديث نموذج
+- `DELETE /api/apartments/:id` - حذف نموذج
 
 ### معلومات المشروع
-- `GET /api/project/info` - جلب معلومات المشروع
-- `PUT /api/project/info` - تعديل معلومات المشروع
-- `GET /api/project/stats` - إحصائيات المشروع
+- `GET /api/project-info/homepage` - بيانات الصفحة الرئيسية
+- `GET /api/project-info/info` - معلومات المشروع
+- `PUT /api/project-info/info/:id` - تحديث معلومات المشروع
 
-## 🔐 الصلاحيات
+### الوسائط
+- `GET /api/media` - جلب الوسائط
+- `POST /api/media/upload` - رفع ملف
+- `DELETE /api/media/:id` - حذف ملف
 
-### الأدوار
-- `super_admin` - مدير النظام (جميع الصلاحيات)
-- `admin` - مدير (جميع الصلاحيات عدا إدارة المديرين)
-- `editor` - محرر (صلاحيات محدودة)
+### الاستفسارات
+- `GET /api/inquiries` - جلب الاستفسارات
+- `POST /api/inquiries` - إنشاء استفسار جديد
+- `PUT /api/inquiries/:id` - تحديث استفسار
 
-### الصلاحيات المتاحة
-- `manage_apartments` - إدارة الشقق
-- `manage_media` - إدارة الوسائط
-- `manage_features` - إدارة المميزات
-- `manage_warranties` - إدارة الضمانات
-- `manage_project_info` - إدارة معلومات المشروع
-- `manage_admins` - إدارة المديرين
-- `view_analytics` - عرض التحليلات
-- `manage_inquiries` - إدارة الاستفسارات
+### المراقبة
+- `GET /health` - فحص صحة الخادم
+- `GET /status` - حالة النظام
 
-## 🛠️ التطوير
+## ☁️ رفع على Vercel
 
-### هيكل المجلدات
-```
-backend/
-├── config/          # إعدادات قاعدة البيانات والخدمات
-├── controllers/     # منطق العمليات
-├── middleware/      # وسطاء العمليات
-├── models/          # نماذج قاعدة البيانات
-├── routes/          # مسارات API
-├── scripts/         # سكريبتس الإعداد
-├── uploads/         # ملفات مرفوعة (تطوير)
-└── server.js        # ملف الخادم الرئيسي
-```
-
-### الأوامر المتاحة
+### الطريقة السريعة
 ```bash
-npm run dev      # تشغيل الخادم للتطوير
-npm start        # تشغيل الخادم للإنتاج
-npm run setup    # إعداد قاعدة البيانات
-npm run seed     # إدراج بيانات تجريبية
+# تثبيت Vercel CLI
+npm i -g vercel
+
+# تسجيل الدخول
+vercel login
+
+# رفع المشروع
+vercel --prod
 ```
 
-## 🔍 اختبار API
+### إعداد متغيرات البيئة في Vercel
+1. اذهب إلى **Settings > Environment Variables**
+2. أضف جميع المتغيرات المطلوبة
+3. تأكد من إضافة `MONGODB_URI` و `JWT_SECRET`
 
-يمكنك اختبار API باستخدام:
-- Postman
-- Thunder Client (VS Code)
-- Insomnia
-
-### مثال على طلب تسجيل الدخول
+### اختبار الرفع
 ```bash
-curl -X POST http://localhost:5000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@project24.com",
-    "password": "admin123"
-  }'
+# اختبار Health Check
+curl https://your-app.vercel.app/health
+
+# اختبار API
+curl https://your-app.vercel.app/api/project-info/homepage
 ```
 
-## 📝 ملاحظات
+## 📚 الوثائق
 
-1. **الأمان**: تأكد من تغيير JWT_SECRET في الإنتاج
-2. **قاعدة البيانات**: استخدم MongoDB Atlas للإنتاج
-3. **رفع الملفات**: استخدم Cloudinary للإنتاج
-4. **المراقبة**: أضف أدوات مراقبة للإنتاج
+- [دليل الرفع على Vercel](VERCEL_DEPLOYMENT.md)
+- [رفع سريع](QUICK_DEPLOY.md)
+- [وثائق الـ Schemas](SCHEMAS_DOCUMENTATION.md)
 
-## 🐛 المشاكل الشائعة
+## 🔍 استكشاف الأخطاء
 
-### خطأ الاتصال بقاعدة البيانات
-تأكد من تشغيل MongoDB وصحة MONGODB_URI
+### خطأ 500 Internal Server Error
+1. تحقق من متغيرات البيئة
+2. تأكد من MongoDB connection
+3. راجع Vercel logs
 
-### خطأ CORS
-تأكد من إعداد CORS بشكل صحيح للفرونت إند
+### خطأ في CORS
+- تم إعداد CORS في `vercel.json`
+- تأكد من headers الصحيحة
 
-### خطأ رفع الملفات
-تحقق من صلاحيات مجلد uploads وحجم الملفات
+### خطأ في Database
+- تحقق من MongoDB Atlas connection string
+- تأكد من IP whitelist
+
+## 📊 مراقبة الأداء
+
+### Vercel
+```bash
+vercel logs
+```
+
+### MongoDB Atlas
+- مراقبة connection count
+- تتبع query performance
+
+## 🛡️ الأمان
+
+- JWT authentication
+- Rate limiting
+- CORS protection
+- Helmet security headers
+- Input validation
+
+## 📈 الأداء
+
+- Serverless functions
+- Connection pooling
+- Compression
+- Caching headers
+- Optimized queries
+
+## 🤝 المساهمة
+
+1. Fork المشروع
+2. إنشاء feature branch
+3. Commit التغييرات
+4. Push إلى branch
+5. إنشاء Pull Request
+
+## 📄 الترخيص
+MIT License
+
+## 📞 الدعم
+
+إذا واجهت مشاكل:
+1. راجع الوثائق
+2. تحقق من logs
+3. اختبر محلياً أولاً
+4. راجع Vercel documentation
+
+---
+
+**ملاحظة**: هذا المشروع محسن للعمل على Vercel serverless functions مع دعم كامل لجميع المميزات.
